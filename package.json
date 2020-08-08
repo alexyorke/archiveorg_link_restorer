@@ -1,0 +1,27 @@
+{
+    "name": "archiveorg_link_restorer",
+    "version": "1.0.0",
+    "description": "",
+    "main": "archiveorg_link_restorer.js",
+    "dependencies": {
+      "got": "^11.5.2",
+      "metascraper": "^5.13.2",
+      "metascraper-author": "^5.13.2",
+      "metascraper-clearbit": "^5.14.1",
+      "metascraper-date": "^5.13.2",
+      "metascraper-description": "^5.13.2",
+      "metascraper-image": "^5.13.2",
+      "metascraper-logo": "^5.13.2",
+      "metascraper-publisher": "^5.13.2",
+      "metascraper-title": "^5.13.2",
+      "metascraper-url": "^5.13.2",
+      "node-fetch": "^2.6.0"
+    },
+    "devDependencies": {},
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Alex Yorke",
+    "license": "ISC"
+  }
+  
