@@ -7,6 +7,10 @@ For example, say you click on a link in a Stack Overflow answer, and it goes to 
 
 Additionally, any news articles or blog posts links' will be automatically redirected to their archive.org links from when the article was published.
 
+## Downloading
+
+There is a [pre-release](https://github.com/alexyorke/archiveorg_link_restorer/releases) version of the script available. I will be converting it to a Chrome and Firefox extension soon.
+
 ## Building
 
 To create the Greasemonkey script, run:
