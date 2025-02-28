@@ -15,7 +15,7 @@
       "metascraper-publisher": "^5.13.2",
       "metascraper-title": "^5.13.2",
       "metascraper-url": "^5.13.2",
-      "node-fetch": "^2.6.0"
+      "node-fetch": "^3.3.2"
     },
     "devDependencies": {},
     "scripts": {
