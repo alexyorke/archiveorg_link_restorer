@@ -4,7 +4,7 @@
     "description": "",
     "main": "archiveorg_link_restorer.js",
     "dependencies": {
-      "got": "^11.5.2",
+      "got": "^14.4.6",
       "metascraper": "^5.13.2",
       "metascraper-author": "^5.13.2",
       "metascraper-clearbit": "^5.14.1",
