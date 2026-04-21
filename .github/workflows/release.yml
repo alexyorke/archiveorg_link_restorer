@@ -1,0 +1,34 @@
+name: Release Userscript
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build userscript
+        run: npm test
+
+      - name: Attach userscript to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/archiveorg_link_restorer.user.js

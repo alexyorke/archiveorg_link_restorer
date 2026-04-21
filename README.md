@@ -13,24 +13,24 @@ There is a [pre-release](https://github.com/alexyorke/archiveorg_link_restorer/r
 
 ## Building
 
-To create the Greasemonkey script, run:
+To install dependencies and build the userscript, run:
 
 ```
-npm install -g browserify
 npm install
-browserify archiveorg_link_restorer.js > bundle.js
+npm test
 ```
 
-Then, append the header:
+The build writes an installable userscript to:
 
 ```
-// ==UserScript==
-// @name         StackExchange/Stack Overflow/news articles archive.org link restorer
-// @namespace    https://github.com/alexyorke/
-// @version      0.1
-// @description  Replace stackoverflow.com and *.stackexchange.com answer URLs with archive.org ones based on the archive.org snapshot of when the answer was posted, and replace links in news articles with those based on when the article was published
-// @author       Alex Yorke
-// @match        *://*/*
-// @grant        none
-// ==/UserScript==
+dist/archiveorg_link_restorer.user.js
 ```
+
+## CI/CD
+
+GitHub Actions now validates pull requests and pushes by:
+
+- syntax-checking the source
+- building the userscript artifact
+
+Published GitHub releases automatically attach the built userscript artifact so the release output matches the local build path.
