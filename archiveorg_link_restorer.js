@@ -1,7 +1,14 @@
-const metascraper = require("metascraper")([require("metascraper-date")()]);
-
-const fetch = require("node-fetch");
 const targetUrl = window.location.href;
+const publishedDateSelectors = [
+  ['meta[property="article:published_time"]', "content"],
+  ['meta[name="article:published_time"]', "content"],
+  ['meta[property="og:published_time"]', "content"],
+  ['meta[name="pubdate"]', "content"],
+  ['meta[name="publishdate"]', "content"],
+  ['meta[name="timestamp"]', "content"],
+  ['meta[itemprop="datePublished"]', "content"],
+  ['time[datetime]', "datetime"],
+];
 
 function dateToYMDHH(date) {
   var s = date.getSeconds();
@@ -27,7 +34,7 @@ function dateToYMDHH(date) {
 if (targetUrl.match(/(.*\.?stackexchange.com)|stackoverflow\.com\//gm)) {
   matchStackExchange();
 } else {
-  fallbackMetascraper();
+  matchPublishedDate();
 }
 
 function matchStackExchange() {
@@ -54,23 +61,46 @@ function matchStackExchange() {
     }
 }
 
-function fallbackMetascraper() {
-    (async () => {
-        fetch(targetUrl)
-            .then((res) => res.text())
-            .then((body) => {
-                const metadata = metascraper({ url: targetUrl, html: body });
-                metadata.then(function (result) {
-                    var links = document.getElementsByTagName("a");
+function matchPublishedDate() {
+    const publishedDate = findPublishedDate(document);
 
-                    for (let i = 0; i < links.length; i++) {
-                        let archiveurl = "https://web.archive.org/web/" +
-                            dateToYMDHH(new Date(result.date)) +
-                            "/" +
-                            links[i].getAttribute("href");
-                        links[i].setAttribute("href", archiveurl);
-                    }
-                });
-            });
-    })();
+    if (!publishedDate) {
+        return;
+    }
+
+    var links = document.getElementsByTagName("a");
+
+    for (let i = 0; i < links.length; i++) {
+        let href = links[i].getAttribute("href");
+        if (!href || !href.startsWith("http")) {
+            continue;
+        }
+
+        let archiveurl = "https://web.archive.org/web/" +
+            dateToYMDHH(publishedDate) +
+            "/" +
+            href;
+        links[i].setAttribute("href", archiveurl);
+    }
+}
+
+function findPublishedDate(rootDocument) {
+    for (let i = 0; i < publishedDateSelectors.length; i++) {
+        let selector = publishedDateSelectors[i][0];
+        let attribute = publishedDateSelectors[i][1];
+        let element = rootDocument.querySelector(selector);
+
+        if (!element) {
+            continue;
+        }
+
+        let value = element.getAttribute(attribute) || element.textContent;
+        let parsedDate = new Date(value);
+
+        if (!Number.isNaN(parsedDate.getTime())) {
+            return parsedDate;
+        }
+    }
+
+    return null;
 }
