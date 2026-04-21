@@ -1,27 +1,15 @@
 {
-    "name": "archiveorg_link_restorer",
-    "version": "1.0.0",
-    "description": "",
-    "main": "archiveorg_link_restorer.js",
-    "dependencies": {
-      "got": "^14.4.6",
-      "metascraper": "^5.13.2",
-      "metascraper-author": "^5.13.2",
-      "metascraper-clearbit": "^5.14.1",
-      "metascraper-date": "^5.13.2",
-      "metascraper-description": "^5.13.2",
-      "metascraper-image": "^5.13.2",
-      "metascraper-logo": "^5.13.2",
-      "metascraper-publisher": "^5.13.2",
-      "metascraper-title": "^5.13.2",
-      "metascraper-url": "^5.13.2",
-      "node-fetch": "^3.3.2"
-    },
-    "devDependencies": {},
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "Alex Yorke",
-    "license": "ISC"
-  }
-  
+  "name": "archiveorg_link_restorer",
+  "version": "1.0.0",
+  "description": "Archive.org link restorer userscript",
+  "main": "archiveorg_link_restorer.js",
+  "scripts": {
+    "lint": "node --check archiveorg_link_restorer.js",
+    "build": "node scripts/build-userscript.js",
+    "test": "npm run lint && npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "author": "Alex Yorke",
+  "license": "ISC"
+}
