@@ -1,4 +1,4 @@
-const targetUrl = window.location.href;
+const hostname = window.location.hostname;
 const publishedDateSelectors = [
   ['meta[property="article:published_time"]', "content"],
   ['meta[name="article:published_time"]', "content"],
@@ -31,26 +31,25 @@ function dateToYMDHH(date) {
   );
 }
 
-if (targetUrl.match(/(.*\.?stackexchange.com)|stackoverflow\.com\//gm)) {
+if (/(^|\.)(stackexchange|stackoverflow)\.com$/i.test(hostname)) {
   matchStackExchange();
 } else {
   matchPublishedDate();
 }
 
 function matchStackExchange() {
-    let answers = document
-        .getElementById("answers")
-        .getElementsByClassName("answer");
+    const container = document.getElementById("answers");
+    if (!container) return;
 
-    for (let i = 0; i < answers.length; i++) {
-        let answer = answers[i];
-        let answerDate = answer
-            .getElementsByTagName("time")[0]
-            .getAttribute("datetime");
+    const answers = container.getElementsByClassName("answer");
+    for (const answer of answers) {
+        const time = answer.getElementsByTagName("time")[0];
+        const answerDate = time && time.getAttribute("datetime");
+        if (!answerDate || Number.isNaN(Date.parse(answerDate))) continue;
         let answerLinks = answer.getElementsByTagName("a");
         for (let j = 0; j < answerLinks.length; j++) {
             let answerLink = answerLinks[j].getAttribute("href");
-            if (answerLink.startsWith("http")) {
+            if (answerLink && answerLink.startsWith("http")) {
                 let archiveurl = "https://web.archive.org/web/" +
                     dateToYMDHH(new Date(answerDate)) +
                     "/" +

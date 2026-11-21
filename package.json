@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "node --check archiveorg_link_restorer.js",
     "build": "node scripts/build-userscript.js",
-    "test": "npm run lint && npm run build"
+    "test": "npm run lint && npm run build && node scripts/test-userscript.cjs"
   },
   "dependencies": {},
   "devDependencies": {},
