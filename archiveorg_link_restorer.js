@@ -1,7 +1,14 @@
-const metascraper = require("metascraper")([require("metascraper-date")()]);
-
-const fetch = require("node-fetch");
-const targetUrl = window.location.href;
+const hostname = window.location.hostname;
+const publishedDateSelectors = [
+  ['meta[property="article:published_time"]', "content"],
+  ['meta[name="article:published_time"]', "content"],
+  ['meta[property="og:published_time"]', "content"],
+  ['meta[name="pubdate"]', "content"],
+  ['meta[name="publishdate"]', "content"],
+  ['meta[name="timestamp"]', "content"],
+  ['meta[itemprop="datePublished"]', "content"],
+  ['time[datetime]', "datetime"],
+];
 
 function dateToYMDHH(date) {
   var s = date.getSeconds();
@@ -24,26 +31,25 @@ function dateToYMDHH(date) {
   );
 }
 
-if (targetUrl.match(/(.*\.?stackexchange.com)|stackoverflow\.com\//gm)) {
+if (/(^|\.)(stackexchange|stackoverflow)\.com$/i.test(hostname)) {
   matchStackExchange();
 } else {
-  fallbackMetascraper();
+  matchPublishedDate();
 }
 
 function matchStackExchange() {
-    let answers = document
-        .getElementById("answers")
-        .getElementsByClassName("answer");
+    const container = document.getElementById("answers");
+    if (!container) return;
 
-    for (let i = 0; i < answers.length; i++) {
-        let answer = answers[i];
-        let answerDate = answer
-            .getElementsByTagName("time")[0]
-            .getAttribute("datetime");
+    const answers = container.getElementsByClassName("answer");
+    for (const answer of answers) {
+        const time = answer.getElementsByTagName("time")[0];
+        const answerDate = time && time.getAttribute("datetime");
+        if (!answerDate || Number.isNaN(Date.parse(answerDate))) continue;
         let answerLinks = answer.getElementsByTagName("a");
         for (let j = 0; j < answerLinks.length; j++) {
             let answerLink = answerLinks[j].getAttribute("href");
-            if (answerLink.startsWith("http")) {
+            if (answerLink && answerLink.startsWith("http")) {
                 let archiveurl = "https://web.archive.org/web/" +
                     dateToYMDHH(new Date(answerDate)) +
                     "/" +
@@ -54,23 +60,46 @@ function matchStackExchange() {
     }
 }
 
-function fallbackMetascraper() {
-    (async () => {
-        fetch(targetUrl)
-            .then((res) => res.text())
-            .then((body) => {
-                const metadata = metascraper({ url: targetUrl, html: body });
-                metadata.then(function (result) {
-                    var links = document.getElementsByTagName("a");
+function matchPublishedDate() {
+    const publishedDate = findPublishedDate(document);
 
-                    for (let i = 0; i < links.length; i++) {
-                        let archiveurl = "https://web.archive.org/web/" +
-                            dateToYMDHH(new Date(result.date)) +
-                            "/" +
-                            links[i].getAttribute("href");
-                        links[i].setAttribute("href", archiveurl);
-                    }
-                });
-            });
-    })();
+    if (!publishedDate) {
+        return;
+    }
+
+    var links = document.getElementsByTagName("a");
+
+    for (let i = 0; i < links.length; i++) {
+        let href = links[i].getAttribute("href");
+        if (!href || !href.startsWith("http")) {
+            continue;
+        }
+
+        let archiveurl = "https://web.archive.org/web/" +
+            dateToYMDHH(publishedDate) +
+            "/" +
+            href;
+        links[i].setAttribute("href", archiveurl);
+    }
+}
+
+function findPublishedDate(rootDocument) {
+    for (let i = 0; i < publishedDateSelectors.length; i++) {
+        let selector = publishedDateSelectors[i][0];
+        let attribute = publishedDateSelectors[i][1];
+        let element = rootDocument.querySelector(selector);
+
+        if (!element) {
+            continue;
+        }
+
+        let value = element.getAttribute(attribute) || element.textContent;
+        let parsedDate = new Date(value);
+
+        if (!Number.isNaN(parsedDate.getTime())) {
+            return parsedDate;
+        }
+    }
+
+    return null;
 }
